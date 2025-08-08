@@ -3,32 +3,31 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1hz8zb35eEaBkNee8a
 let startIndex = 0;
 const limit = 5;
 
-document.getElementById("uploadForm").addEventListener("submit", function (e) {
+document.getElementById('uploadForm').addEventListener('submit', function (e) {
   e.preventDefault();
-  const fileInput = e.target.elements.file;
-  const file = fileInput.files[0];
-  if (!file) return;
 
-  const formData = new FormData();
-  formData.append("file", file);
+  const files = document.querySelector('input[type="file"]').files;
+  if (!files.length) return;
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: formData,
-  })
-    .then((res) => res.text())
-    .then((msg) => {
-      document.getElementById("message").textContent = msg;
-      fileInput.value = "";
-      startIndex = 0;
-      document.getElementById("fileList").innerHTML = "";
-      loadFiles();
+  Array.from(files).forEach(file => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: formData,
     })
-    .catch((err) => {
-      console.error(err);
-      document.getElementById("message").textContent = "Upload failed.";
+    .then(res => res.text())
+    .then(msg => {
+      console.log('Uploaded:', msg);
+      // Optionally refresh file list
+    })
+    .catch(err => {
+      console.error('Upload failed:', err);
     });
+  });
 });
+
 
 function loadFiles() {
   fetch(`${SCRIPT_URL}?start=${startIndex}&limit=${limit}`)
