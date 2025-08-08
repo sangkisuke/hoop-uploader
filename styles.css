@@ -1,10 +1,17 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f9f9f9 url('https://images.unsplash.com/photo-1517649763962-0c623066013b') no-repeat center center fixed;
+  background: url('https://images.unsplash.com/photo-1602339905010-29e4c6a0db35?auto=format&fit=crop&w=1740&q=80') no-repeat center center fixed;
   background-size: cover;
-  margin: 0;
-  padding: 0;
-  color: #fff;
+  background-attachment: fixed;
+  color: #ffffff;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
 }
 
 .container {
@@ -38,11 +45,13 @@ input[type="file"] {
 }
 
 .thumbnail {
-  background: #222;
-  padding: 0.5em;
-  border-radius: 5px;
-  text-align: center;
+  height: 100px; /* Half the original height */
+  width: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 
 .thumbnail img {
   max-width: 100%;
