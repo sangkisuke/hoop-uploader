@@ -42,23 +42,27 @@ input[type="file"] {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 1em;
+  align-items: start;
 }
+
 
 .thumbnail {
   background: rgba(255, 255, 255, 0.05);
   padding: 0.5em;
   border-radius: 8px;
   text-align: center;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .thumbnail img {
-  height: 100px; /* smaller height */
-  width: auto;
+  height: 100px;
+  width: 100%;
   object-fit: cover;
   border-radius: 5px;
   display: block;
-  margin: 0 auto;
 }
+
 
 .thumbnail p {
   margin: 0.5em 0 0;
