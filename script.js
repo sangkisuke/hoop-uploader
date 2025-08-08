@@ -10,21 +10,25 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
   if (!files.length) return;
 
   Array.from(files).forEach(file => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: formData,
-    })
-    .then(res => res.text())
-    .then(msg => {
-      console.log('Uploaded:', msg);
-      // Optionally refresh file list
-    })
-    .catch(err => {
-      console.error('Upload failed:', err);
-    });
+    const reader = new FileReader();
+    reader.onload = function () {
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: reader.result,
+        headers: {
+          "Content-Type": file.type
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Uploaded:", data);
+          loadFiles(); // reload gallery
+        })
+        .catch(err => {
+          console.error("Upload failed:", err);
+        });
+    };
+    reader.readAsArrayBuffer(file);
   });
 });
 
