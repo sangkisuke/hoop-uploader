@@ -1,72 +1,59 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1hz8zb35eEaBkNee8aqrv0xSzLH3y8L8IT93a9xroIHx8ZtpR8Y8Ys_57lo0OcHUC3w/exec'; // Replace this with your Apps Script exec URL
-
-let startIndex = 0;
+let start = 0;
 const limit = 5;
-
-document.getElementById('uploadForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const files = document.querySelector('input[type="file"]').files;
-  if (!files.length) return;
-
-  Array.from(files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = function () {
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: reader.result,
-        headers: {
-          "Content-Type": file.type
-        }
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log("Uploaded:", data);
-          loadFiles(); // reload gallery
-        })
-        .catch(err => {
-          console.error("Upload failed:", err);
-        });
-    };
-    reader.readAsArrayBuffer(file);
-  });
-});
-
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1hz8zb35eEaBkNee8aqrv0xSzLH3y8L8IT93a9xroIHx8ZtpR8Y8Ys_57lo0OcHUC3w/exec';
 
 function loadFiles() {
-  fetch(`${SCRIPT_URL}?start=${startIndex}&limit=${limit}`)
-    .then((res) => res.json())
-    .then((files) => {
-      if (!files || files.length === 0) {
-        if (startIndex === 0) {
-          document.getElementById("fileList").innerHTML = "<p>No files found.</p>";
-        }
-        document.getElementById("loadMoreBtn").style.display = "none";
+  fetch(`${SCRIPT_URL}?start=${start}&limit=${limit}`)
+    .then(res => res.json())
+    .then(data => {
+      const gallery = document.getElementById('fileList');
+      if (!data.files || !data.files.length) {
+        document.getElementById('loadMoreBtn').style.display = 'none';
         return;
       }
 
-      files.forEach((file) => {
-        const div = document.createElement("div");
-        div.className = "thumbnail";
-        div.innerHTML = `
-          <a href="${file.url}" target="_blank">
-            <img src="${file.thumbnail}" alt="${file.name}" />
-          </a>
-          <p><strong>${file.name}</strong></p>
-          <p>${file.type}</p>
-          <p>${file.size}</p>
-        `;
-        document.getElementById("fileList").appendChild(div);
+      data.files.forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'thumbnail';
+
+        const thumb = document.createElement('img');
+        thumb.src = file.thumbnail;
+        thumb.alt = file.name;
+
+        const name = document.createElement('p');
+        name.textContent = file.name;
+
+        const size = document.createElement('p');
+        size.textContent = `${file.size} KB`;
+
+        const link = document.createElement('a');
+        link.href = file.url;
+        link.target = '_blank';
+        link.appendChild(thumb);
+
+        div.appendChild(link);
+        div.appendChild(name);
+        div.appendChild(size);
+        gallery.appendChild(div);
       });
 
-      startIndex += files.length;
-      document.getElementById("loadMoreBtn").style.display = "block";
+      start += limit;
     })
-    .catch((err) => {
-      console.error("Failed to load files", err);
-      document.getElementById("message").textContent = "Failed to load file list.";
+    .catch(err => {
+      console.error("Failed to load file list:", err);
     });
 }
 
-document.getElementById("loadMoreBtn").addEventListener("click", loadFiles);
-window.onload = loadFiles;
+document.getElementById('loadMoreBtn').addEventListener('click', loadFiles);
+
+// 👇 Listen for postMessage from iframe after upload
+window.addEventListener("message", (event) => {
+  if (event.data && event.data.status === "success") {
+    loadFiles();
+  } else if (event.data && event.data.status === "error") {
+    alert("Upload failed: " + event.data.message);
+  }
+});
+
+// Initial load
+loadFiles();

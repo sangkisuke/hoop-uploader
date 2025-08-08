@@ -9,14 +9,27 @@
 <body>
   <div class="container">
     <h1>🏀 Hoop Uploader</h1>
-    <form id="uploadForm">
+
+    <!-- Upload form using iframe target -->
+    <form
+      id="uploadForm"
+      action="https://script.google.com/macros/s/AKfycbx1hz8zb35eEaBkNee8aqrv0xSzLH3y8L8IT93a9xroIHx8ZtpR8Y8Ys_57lo0OcHUC3w/exec"
+      method="POST"
+      enctype="multipart/form-data"
+      target="uploadFrame"
+    >
       <input type="file" name="file" id="fileInput" multiple required />
       <button type="submit">Upload</button>
     </form>
+
+    <!-- Hidden iframe for background uploading -->
+    <iframe name="uploadFrame" style="display: none;"></iframe>
+
     <div id="message"></div>
     <div id="fileList" class="gallery"></div>
     <button id="loadMoreBtn">Load More</button>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
