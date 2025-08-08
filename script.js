@@ -2,11 +2,13 @@ let start = 0;
 const limit = 5;
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1hz8zb35eEaBkNee8aqrv0xSzLH3y8L8IT93a9xroIHx8ZtpR8Y8Ys_57lo0OcHUC3w/exec';
 
+// Load files paginated
 function loadFiles() {
   fetch(`${SCRIPT_URL}?start=${start}&limit=${limit}`)
     .then(res => res.json())
     .then(data => {
       const gallery = document.getElementById('fileList');
+
       if (!data.files || !data.files.length) {
         document.getElementById('loadMoreBtn').style.display = 'none';
         return;
@@ -44,16 +46,17 @@ function loadFiles() {
     });
 }
 
-document.getElementById('loadMoreBtn').addEventListener('click', loadFiles);
-
-// 👇 Listen for postMessage from iframe after upload
+// ✅ Listen for iframe's success message
 window.addEventListener("message", (event) => {
-  if (event.data && event.data.status === "success") {
-    loadFiles();
-  } else if (event.data && event.data.status === "error") {
-    alert("Upload failed: " + event.data.message);
+  if (event.data?.status === "success") {
+    document.getElementById('message').textContent = "Upload successful!";
+    loadFiles(); // refresh gallery
+  } else if (event.data?.status === "error") {
+    document.getElementById('message').textContent = `Upload failed: ${event.data.message}`;
   }
 });
+
+document.getElementById('loadMoreBtn').addEventListener('click', loadFiles);
 
 // Initial load
 loadFiles();
